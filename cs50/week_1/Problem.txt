@@ -1,0 +1,581 @@
+CS50X习题集前提说明
+    CS50X课程越多人开始学习，但是都反馈对于习题集不方便学习。因此编辑此专栏，为各位习题集的学习提供帮助。如果你可以访问哈佛大学的官网且英语过关，你可以通过下面的网站查看官方的说明以及使用官方提供的云端VSCode：
+
+https://cs50.harvard.edu/x/2023
+
+https://cs50.dev/
+
+如果你缺乏上述条件，你可以往下查看我翻译的中文官网说明和参考答案。
+
+本地编译习题集，你需要VSCode，可以从官网下载。另外需要CS50.h，即该课程的第三方库，该库没有提供Windows版本，你需要安装Linux或Mac系统才能使用。如果不使用CS50.h也是可以的，只要不使用其中的函数，一般为输入函数，你可以用scanf来替代。
+
+GitHub地址如下：
+
+cs50/libcs50: This is CS50's Library for C. (github.com)
+
+根据自己的系统使用对应的代码：
+
+Ubuntu：
+
+$ curl -s https://packagecloud.io/install/repositories/cs50/repo/script.deb.sh | sudo bash
+$ sudo apt-get install libcs50
+Fedora：
+
+$ curl -s https://packagecloud.io/install/repositories/cs50/repo/script.rpm.sh | sudo bash
+$ yum install libcs50
+Linux & Mac：
+
+从这里下载库：https://pan.baidu.com/s/1L_9tJQT0ziV8O2IQr-Ytsw 提取码: qwha
+
+Extract libcs50-*.*
+
+通过终端完成第2、3、4步，该步骤为解压
+
+
+cd libcs50-*
+
+选择你所下载文件的路径
+
+
+sudo make install
+
+通过该安装指令安装
+
+如果出现报错，请参考下面方法解决：
+
+当你编译程序时出现/usr/bin/ld: cannot find -lcs50 
+
+添加 export LIBRARY_PATH=/usr/local/lib 到你的 .bashrc.
+
+当你编译程序时出现报错: 'cs50.h' file not found 
+
+添加 export C_INCLUDE_PATH=/usr/local/include 到你的 .bashrc.
+
+在程序执行时，出现加载共享库的错误: libcs50.so.8: cannot open shared object file: No such file or directory 
+
+添加 export LD_LIBRARY_PATH=/usr/local/lib 到你的 .bashrc.
+
+
+Week1 C 官方说明
+    第一周的习题集包括一个Lab和一个包含两种难度的三个Problem Set。官方建议先通过Lab熟悉相关语法，再自行编写Problem Set。
+
+Lab1:人口增长问题
+
+    背景：
+
+    假设我们有数量为n的骆驼，每年有n/3的骆驼出生，n/4的骆驼死亡。例如，我们有1200只骆驼，则到第一年年底时，1200/3=400只骆驼出生，而1200/4=300只骆驼死亡，最终我们拥有1200+400-300=1300只骆驼。
+
+    在另一个例子中，我们拥有1000只骆驼，那么出生的骆驼将会是1000/3=333.33只，但是我们不能拥有小数点的骆驼，那么小数点后的骆驼要被截断，即为333只。（C语言的整数除法也是截断小数点的部分，需要注意）
+
+    目标：
+
+    你需要实现的程序population.c，需要包括以下功能：
+
+程序应首先提示用户输入起始数量大小。如果用户输入的数字小于 9（允许的最小人口大小），则应重新提示用户输入起始人口大小，直到他们输入大于或等于 9 的数字。（如果我们从少于9只美洲驼开始，美洲驼的数量将很快停滞不前！）
+
+然后，程序应提示用户输入结束人口大小。如果用户输入的数字小于起始人口大小，则应重新提示用户输入结束人口大小，直到他们输入的数字大于或等于起始人口大小。（毕竟，我们希望美洲驼的数量增长！）
+
+然后，程序应计算人口至少达到结束值大小所需的（整数）年数。
+
+最后，您的程序应该打印美洲驼种群达到该最终大小所需的年数，例如通过打印到终端，其中是年数。格式为
+
+Years:n
+    提示：
+
+    如果要在满足某个条件之前反复提示用户输入变量的值，则可能需要使用循环。例如，回忆一下课程中的以下代码，该代码反复提示用户，直到他们输入正整数。do ... while
+
+要声明新变量，请确保指定其数据类型、变量的名称以及（可选）其初始值应是什么。例如，您可能希望创建一个变量来跟踪过去了多少年。
+
+要计算人口达到最终规模需要多少年，另一个循环可能会有所帮助！在循环中，您可能希望根据后台中的公式更新人口大小，并更新已过去的年数。
+
+要将整数打印到终端，请记住您可以使用一行代码，以指定变量应填充占位符，例如n
+
+printf("The number is %i\n", n);
+    您的程序应按照下面的这些示例运行：
+
+$ ./population
+Start size: 1200
+End size: 1300
+Years: 1
+$ ./population
+Start size: -5
+Start size: 3
+Start size: 9
+End size: 5
+End size: 18
+Years: 8
+$ ./population
+Start size: 20
+End size: 1
+End size: 10
+End size: 100
+Years: 20
+
+ProblemSet1：Mario
+
+    背景：
+
+    在任天堂的超级马里奥兄弟世界 1-1 开始时，马里奥必须跳过相邻的方块金字塔，如下所示。
+
+
+
+我们要做的就是用#打印这些方块
+    让我们用 C 语言重新创建这些金字塔，尽管是在文本中，使用哈希 （#） 表示砖块，如下所示。每个哈希值都比宽度高一点，因此金字塔本身也会比宽度高。
+
+    我们将编写的程序将称为 Mario.c，让我们允许用户决定金字塔应该有多高，首先提示他们输入一个介于 1 和 8 之间的正整数。同样的如果超过这个范围，你应该让用户输入循环重新运行，需要使用的循环代码参考Lab1。运行的示例如下：
+
+$ ./mario
+Height: -1
+Height: 0
+Height: 42
+Height: 50
+Height: 4
+   #  #
+  ##  ##
+ ###  ###
+####  ####
+    请注意，无论金字塔的高度如何，相邻金字塔之间的“间隙”宽度都等于两个哈希的宽度。
+
+  
+
+
+  ProblemSet1：Cash
+
+    背景：
+
+    贪婪算法是一种经典算法，其用于在进行交换零钱时，您可能希望尽量减少为每个客户分配的硬币数量，以免用完或惹恼客户！幸运的是，计算机科学为各地的收银员提供了减少硬币数量的方法：贪婪算法。
+
+    根据美国国家标准与技术研究院（NIST）的说法，贪婪的算法是一种“在寻找答案时总是采取最佳的即时或本地解决方案的算法。贪婪的算法为某些优化问题找到整体或全局的最佳解决方案，但可能会为其他问题的某些实例找到不太理想的解决方案。这是什么意思？好吧，假设收银员欠客户一些零钱，而收银员的抽屉里有四分之一（25美分），一角钱（10美分），镍币（5美分）和便士（1美分）。要解决的问题是决定将哪些硬币以及每种硬币的数量交给客户。把一个“贪婪”的收银员想象成一个想用他们从抽屉里拿出的每一枚硬币尽可能从这个问题中得到最大影响的人。例如，如果某个客户被欠41美分，那么可以吃的最大的第一口（即最好的即时或本地）是25美分。（这种咬合是“最好的”，因为它让我们比任何其他硬币更快地接近0¢。请注意，这种大小的咬一口会将 41 美分的问题减少到 16 美分的问题，因为 41 - 25 = 16。也就是说，其余部分是一个类似但较小的问题。不用说，再咬 25 美分就太大了（假设收银员不想赔钱），所以我们贪婪的收银员会继续吃 10 美分的咬，给他或她留下 6 美分的问题。在这一点上，贪婪要求咬一口5美分，然后咬一口1美分，此时问题就解决了。客户收到四分之一、一角钱、一镍币和一便士：总共四枚硬币。
+
+    事实证明，这种贪婪的方法（即算法）不仅是局部最优的，而且对于美国的货币（以及欧盟的货币）来说也是全球性的。也就是说，只要收银员有足够的每个硬币，这种从大到小的方法将产生尽可能少的硬币。多少？好吧，你告诉我们！
+
+    目标：
+
+    下面是已经为提供的代码框架：
+
+#include <cs50.h>
+#include <stdio.h>
+
+int get_cents(void);
+int calculate_quarters(int cents);
+int calculate_dimes(int cents);
+int calculate_nickels(int cents);
+int calculate_pennies(int cents);
+
+int main(void)
+{
+    // Ask how many cents the customer is owed
+    int cents = get_cents();
+
+    // Calculate the number of quarters to give the customer
+    int quarters = calculate_quarters(cents);
+    cents = cents - quarters * 25;
+
+    // Calculate the number of dimes to give the customer
+    int dimes = calculate_dimes(cents);
+    cents = cents - dimes * 10;
+
+    // Calculate the number of nickels to give the customer
+    int nickels = calculate_nickels(cents);
+    cents = cents - nickels * 5;
+
+    // Calculate the number of pennies to give the customer
+    int pennies = calculate_pennies(cents);
+    cents = cents - pennies * 1;
+
+    // Sum coins
+    int coins = quarters + dimes + nickels + pennies;
+
+    // Print total number of coins to give the customer
+    printf("%i\n", coins);
+}
+
+int get_cents(void)
+{
+    // TODO
+    return 0;
+}
+
+int calculate_quarters(int cents)
+{
+    // TODO
+    return 0;
+}
+
+int calculate_dimes(int cents)
+{
+    // TODO
+    return 0;
+}
+
+int calculate_nickels(int cents)
+{
+    // TODO
+    return 0;
+}
+
+int calculate_pennies(int cents)
+{
+    // TODO
+    return 0;
+}
+    你需要实现以下功能：
+
+     cash.c, 我们已经实施了大多数（但不是全部！）一个程序，提示用户向客户所欠的美分数，然后打印可以进行更改的最小数量的硬币。的确， main 已经为你实施了。但请注意，主调用几个尚未实现的函数！这些功能之一， get_cents ，无需参数(如 void所示) 并且返回一个int. 其余的函数都接受一个参数，一个int，并返回一个int。它们目前都return 0，以便代码编译。但您需要用自己的代码替换每个TODO并return 0。具体来说，按以下方式完成这些功能的实施：
+
+以这样的方式实现，get_cents即函数提示用户输入美分数，然后get_int将该数字作为int。如果用户输入负数，您的代码应再次提示用户。（但是您不必担心用户输入，例如，a string ，因为get_int会为您处理。很有可能你会使用一个do while循环，就像在mario.c中一样！
+
+calculate_quarters以这样一种方式实现：以这样的方式，该函数计算（并作为int返回）如果客户需要交换一定数美分，他们应该得到多少个25美分。例如，如果交换的美分是25，那么 calculate_quarters应该return 1。如果美分是26或49（或介于两者之间的任何东西，那么calculate_quarters也应该return 1。如果美分是50或74（或介于两者之间的任何东西），那么 calculate_quarters应该return 2。
+
+calculate_dimes以这样的方式实现，即函数计算需要交换的10美分。
+
+calculate_nickels以这样的方式实现，即函数计算需要交换的5美分。
+
+calculate_pennies以这样的方式实现，即函数计算需要交换的1美分。
+
+    请注意，与只有副作用的函数不同，返回值的函数应该明确返回！注意不要修改分发代码本身，只替换给定的TODO和随后的返回值！另请注意，回想一下抽象的想法，您的每个计算函数都应该接受任何美分的值，而不仅仅是贪婪算法可能建议的那些值。例如，如果美分为85，calculate_dimes应该返回8。
+
+    提示：
+
+    程序运行应如下：
+
+$ ./cash
+Change owed: 41
+4
+$ ./cash
+Change owed: -41
+Change owed: foo
+Change owed: 41
+4
+   
+
+
+ProblemSet1：Credit
+
+    背景：
+
+   信用卡（或借记卡）是一种塑料卡，您可以用它支付商品和服务。打印在该卡上的是一个数字，该数字也存储在某个数据库中，因此当您的卡用于购买东西时，债权人知道该向谁开具账单。世界上有很多人使用信用卡，所以这些数字相当长：美国运通（American Express）使用15位数字，万事达卡（MasterCard）使用16位数字，Visa使用13位和16位数字。这些是十进制数（0到9），而不是二进制，这意味着，例如，美国运通可以打印多达10^15 = 1,000,000,000,000,000张独特的卡片！（那是，嗯，一万亿。）
+
+    实际上，这有点夸张，因为信用卡号码实际上有一些结构。所有美国运通号码都以34或37开头；大多数万事达卡号码以51、52、53、54或55开头（他们还有一些其他潜在的起始号码，我们不会关心这个问题）；所有Visa号码都以4开头。但信用卡号码中也内置了一个“校验和”，即至少一个号码与其他号码之间的数学关系。该校验和使计算机（或喜欢数学的人）能够检测错误的号码（例如转置），如果不是欺诈性数字，而无需查询数据库，数据库可能很慢。当然，一个不诚实的数学家当然可以制作一个假数字，尽管如此，但要尊重数学约束，因此对于更严格的检查，仍然需要进行数据库查找。
+
+    那么秘密配方是什么？好吧，大多数卡片都使用IBM的Hans Peter Luhn发明的算法。根据Luhn的算法，您可以按以下方式确定信用卡号是否（语法）有效：
+
+将其他数字乘以2，从数字的倒数第二位开始，然后将这些产品的数字相加。
+
+将总和加到没有乘以2的数字的总和中。
+
+如果总数的最后一个数字是0（或者，更正式地说，如果总模10与0同余），则该数字是有效的！
+
+这有点令人困惑，所以让我们用David的Visa试试一个例子：4003600000000014.
+
+为了讨论起见，让我们先在所有其他数字加粗，从数字的倒数第二位开始：
+
+4003600000000014
+
+好的，让我们把每个加粗的数字乘以2：
+
+1•2 + 0•2 + 0•2 + 0•2 + 0•2 + 6•2 + 0•2 + 4•2
+
+这给了我们：
+
+2 + 0 + 0 + 0 + 0 + 12 + 0 + 8
+
+现在让我们把这些数字加在一起：
+
+2 + 0 + 0 + 0 + 0 + 1 + 2 + 0 + 8 = 13
+
+现在，让我们将该总和（13）添加到未乘以2（从末尾开始）的数字之和中：
+
+13 + 4 + 0 + 0 + 0 + 0 + 0 + 3 + 0 = 20
+
+    是的，那个总和（20）的最后一个数字是0，所以大卫的卡片是合法的！因此，验证信用卡号码并不难，但用手确实有点乏味。让我们写一个程序。
+
+    提示：
+
+    在信用目录中名为credit.c的文件中，编写一个程序，提示用户输入信用卡号，然后根据此处每个格式的定义，报告（通过printf）它是否是有效的美国运通、万事达卡或维萨卡号。为了我们可以自动测试您的代码，我们要求您的程序的最后一行输出为AMEX\n或MASTERCARD\n或VISA\n或INVALID\n，仅此而已。为了简单起见，您可以假设用户的输入将完全是数字（即没有连字符，可能印在实际卡片上），并且不会有前导零。但不要假设用户的输入会适合一个int！最好使用CS50库中的get_long来获取用户的输入。（为什么？）考虑以下代表您自己的程序在传递有效信用卡号（无连字符）时应如何表现。
+
+$ ./credit
+Number: 4003600000000014
+VISA
+    现在，无论如何，get_long本身都会拒绝连字符（以及更多）：
+
+$ ./credit
+Number: 4003-6000-0000-0014
+Number: foo
+Number: 4003600000000014
+VISA
+    但这取决于你来捕捉不是信用卡号码（例如电话号码）的输入，即使数字：
+
+$ ./credit
+Number: 6176292929
+INVALID
+    用一大堆有效和无效的输入来测试您的程序。（我们肯定会的！）以下是PayPal建议测试的几个卡号。
+
+    https://developer.paypal.com/api/nvp-soap/payflow/integration-guide/test-transactions/#standard-test-cards
+
+    如果您的程序在某些输入上行为不正确（或根本不编译），是时候debug了！
+
+ 
+
+参考答案：
+    请确保你已经做完了相关的习题集，如果实在做不出来，可以参考答案想想思路。
+
+    Lab1:
+
+#include <cs50.h>
+#include <math.h>
+#include <stdio.h>
+
+double year_popluation(double first, double end);
+
+int main(void)
+{
+    int first, end;
+    double time;
+    do
+    {
+        first = get_double("Please input the number of llama in the first.\n");
+    }
+    while (first < 9);
+    do
+    {
+        end = get_double("Please input the number of llama in the end,\n"); // get the number of the first or the end
+    }
+    while (end - first < 0);
+    time = year_popluation(first, end);
+    printf("Years: %.0lf\n", time);
+}
+
+double year_popluation(double first, double end)
+{
+    double t = log10(end / first) / log10(13.0 / 12.0); // calculate the time of year to meet the goal in the end.
+    t = floor(t);
+    return t;
+}
+    该题目思路很清晰，n/3出生，4/n死亡，也就是增长率为1/12，即每十二只骆驼到年底增长一只。但是注意骆驼的增长是连续增长的，新骆驼应算作在下一年度的骆驼增长里面。和银行的复利类似，因此通过骆驼数量的增长公式即可倒推时间的计算公式。注意C语言中整数除法（舍弃小数点）通常会带来很多直觉上的不一致，记得在除法中使用浮点。
+
+   
+
+
+     Problem Set1: Mario
+
+#include <cs50.h>
+#include <stdio.h>
+
+int main(void)
+{
+    int blocks;
+    do
+    {
+        blocks = get_int("postive block number is ?\n"); // get int for user
+    }
+    while (blocks < 1 || blocks > 8); // run loop unless blocks >1&&<8
+    for (int i = 0; i < blocks; i++)  // int i adds 1 each loop (the run times)
+    {
+        for (int b = blocks - i; b > 1; b--) // print whitespace before"#"
+        {
+            printf(" ");
+        }
+        for (int j = 0; j <= i; j++)
+        { // print # each number from 1
+            printf("#");
+        }
+
+        printf("\n"); // each part # in new line
+    }
+}
+    该程序比较简单，利用For循环打印自己需要的空格以及#值即可，注意循环的条件。如果不清楚，可以用笔在纸上写几段循环的运行情况，自己理一理。
+
+       
+
+
+    Problem Set1: Cash
+
+#include <cs50.h>
+#include <stdio.h>
+
+int get_cents(void);
+int calculate_quarters(int cents);
+int calculate_dimes(int cents);
+int calculate_nickels(int cents);
+int calculate_pennies(int cents);
+
+int main(void)
+{
+    // Ask how many cents the customer is owed
+    int cents = get_cents();
+
+    // Calculate the number of quarters to give the customer
+    int quarters = calculate_quarters(cents);
+    cents = cents - quarters * 25;
+
+    // Calculate the number of dimes to give the customer
+    int dimes = calculate_dimes(cents);
+    cents = cents - dimes * 10;
+
+    // Calculate the number of nickels to give the customer
+    int nickels = calculate_nickels(cents);
+    cents = cents - nickels * 5;
+
+    // Calculate the number of pennies to give the customer
+    int pennies = calculate_pennies(cents);
+    cents = cents - pennies * 1;
+
+    // Sum coins
+    int coins = quarters + dimes + nickels + pennies;
+
+    // Print total number of coins to give the customer
+    printf("%i\n", coins);
+}
+
+int get_cents(void)
+{
+    int money;
+    do
+    {
+        money = get_int("Please input the number of money need to change?\n"); // get the number of money need to change
+    }
+    while (money < 0);
+
+    return money;
+}
+
+int calculate_quarters(int cents)
+{
+    int quarters;
+    quarters = cents / 25; // TODO
+    return quarters;
+}
+
+int calculate_dimes(int cents)
+{
+    int dimes;
+    dimes = cents / 10; // TODO
+    return dimes;
+}
+
+int calculate_nickels(int cents)
+{
+    int nickels;
+    nickels = cents / 5; // TODO
+    return nickels;
+}
+
+int calculate_pennies(int cents)
+{
+    int pennies;
+    pennies = cents / 1; // TODO
+    return pennies;
+}
+    该程序的核心在于贪婪算法的四个函数，注意返回值哦，注意函数的变量（函数内部的变量没有全局声明的话，在其他地方不可以用的！），你可以的！
+
+    
+
+
+    Problem Set1: Credit
+
+#include <cs50.h>
+#include <math.h>
+#include <stdio.h>
+
+long valid_number(long number);
+long count_digit(long number);
+long position_digit(long number, int numer);
+
+int main()
+{
+    long number = get_long("number:?\n"); // get crdit number for user
+    long sum = valid_number(number);
+    if (sum % 10 != 0)
+    {
+        printf("INVALID\n");
+    }
+    else
+    {
+        if (count_digit(number) == 15)
+        {
+            if (position_digit(number, 1) == 3 && (position_digit(number, 2) == 4 || position_digit(number, 2) == 7))
+            {
+                printf("AMEX\n");
+            }
+            else
+            {
+                printf("INVALID\n");
+            }
+        }
+        else if (count_digit(number) == 16 && position_digit(number, 1) == 5)
+        {
+            if (position_digit(number, 2) == 1 || position_digit(number, 2) == 2 || position_digit(number, 2) == 3 ||
+                position_digit(number, 2) == 4 || position_digit(number, 2) == 5)
+            {
+                printf("MASTERCARD\n");
+            }
+            else
+            {
+                printf("INVALID\n");
+            }
+        }
+        else if (count_digit(number) == 13 || count_digit(number) == 16)
+        {
+            if (position_digit(number, 1) == 4)
+            {
+                printf("VISA\n");
+            }
+            else
+            {
+                printf("INVALID\n");
+            }
+        }
+        else
+        {
+            printf("INVALID\n");
+        }
+    }
+    return 0;
+}
+
+long valid_number(long number)
+{
+    int sum = 0;
+    bool double_digit = false;
+    while (number > 0)
+    {
+        int digit = number % 10;
+        if (double_digit) // double if bool is true
+        {
+            digit *= 2;
+            if (digit > 9) // % if number > 9 after double
+            {
+                digit = digit - 9;
+            }
+        }
+        sum += digit;
+        double_digit = !double_digit; // make bool is true or false
+        number /= 10;
+    }
+    return sum;
+}
+
+long count_digit(long number)
+{
+    int count = 0;
+    while (number > 0)
+    {
+        number /= 10;
+        count++;
+    }
+    return count;
+}
+
+long position_digit(long number, int position)
+{
+    int numdigit = count_digit(number);
+    if (position > numdigit || position < 1)
+    {
+        return 0;
+    }
+    long divisor = pow(10, numdigit - position);
+    int digit = (number / divisor) % 10;
+    return digit;
+}
+    该程序的关键点一是卢恩算法的验证，即提取对应数字，乘以2（大于10的话要减9！）加和，另外的数字加和，最终取10的余数，能否验证该信用卡号码准确。其次，你需要针对不同信用卡的类型，分别写循环判定，确定对应的信用卡类型并打印出来。 
